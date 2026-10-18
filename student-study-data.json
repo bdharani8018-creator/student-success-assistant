@@ -1,0 +1,1018 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Success Assistant</title>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+    --primary: #3049a8;
+    --primary-dark: #213578;
+    --background: #f3f6fc;
+    --card: #ffffff;
+    --text: #26334d;
+    --muted: #65728a;
+    --green: #16835b;
+    --border: #dce3ef;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
+
+header {
+    background: linear-gradient(135deg, #213578, #536fe0);
+    color: white;
+    padding: 30px 18px;
+    text-align: center;
+}
+
+header h1 { margin: 0 0 10px; }
+header p { margin-bottom: 0; }
+
+main {
+    max-width: 1000px;
+    margin: 25px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: var(--card);
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(25, 45, 90, 0.07);
+}
+
+h2 {
+    color: var(--primary-dark);
+    margin-top: 0;
+}
+
+h3 { color: var(--primary-dark); }
+
+label {
+    display: block;
+    margin: 12px 0 5px;
+    font-weight: bold;
+}
+
+input, select, button {
+    font: inherit;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+input, select {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+}
+
+button {
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover { background: var(--primary-dark); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.full-button {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.secondary-button { background: #64748b; }
+.green-button { background: var(--green); }
+.red-button { background: #b42318; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.stat {
+    padding: 16px;
+    background: #eef2ff;
+    border-radius: 10px;
+}
+
+.stat strong {
+    display: block;
+    color: var(--primary-dark);
+    font-size: 27px;
+    margin-top: 8px;
+}
+
+.muted { color: var(--muted); }
+
+.progress-background {
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#progressFill {
+    width: 0;
+    height: 100%;
+    background: var(--green);
+    transition: width 0.3s;
+}
+
+.task {
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-top: 12px;
+    border-radius: 10px;
+}
+
+.task-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.task-name {
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.task.completed .task-name {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.task-details {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.task-actions button {
+    padding: 9px 11px;
+    font-size: 13px;
+}
+
+.priority {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.priority-High { background: #fee2e2; color: #991b1b; }
+.priority-Medium { background: #fef3c7; color: #92400e; }
+.priority-Low { background: #dcfce7; color: #166534; }
+
+.timer {
+    font-size: 52px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-dark);
+    margin: 20px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.timer-buttons button { flex: 1; }
+
+.recommendation {
+    background: #eef2ff;
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 13px;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+#message {
+    color: var(--green);
+    font-weight: bold;
+}
+
+#studyPlan { line-height: 1.8; }
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .timer { font-size: 42px; }
+    .card { padding: 17px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+    <h1>Student Success Assistant</h1>
+    <p>Plan your study. Build habits. Achieve your goals.</p>
+</header>
+
+<main>
+    <section class="card">
+        <h2>Welcome, Student!</h2>
+        <p>Make every study session count.</p>
+
+        <label for="studentName">Your name</label>
+        <input id="studentName" placeholder="Enter your name">
+        <button class="full-button" id="saveNameButton">Save Name</button>
+        <p id="welcomeMessage" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+        <h2>My Study Dashboard</h2>
+        <div class="grid">
+            <div class="stat">
+                Total tasks
+                <strong id="totalTasks">0</strong>
+            </div>
+            <div class="stat">
+                Completed tasks
+                <strong id="completedTasks">0</strong>
+            </div>
+            <div class="stat">
+                Daily goal
+                <strong id="goalProgress">0 / 3</strong>
+            </div>
+            <div class="stat">
+                Study streak
+                <strong id="streakCount">0 days</strong>
+            </div>
+        </div>
+
+        <h3>Overall Task Progress</h3>
+        <div class="progress-background">
+            <div id="progressFill"></div>
+        </div>
+        <p id="progressText">0% completed</p>
+    </section>
+
+    <section class="card">
+        <h2>Daily Goals</h2>
+        <p class="muted">Complete these small actions to build a consistent study habit.</p>
+
+        <div id="dailyGoals">
+            <label><input type="checkbox" id="goal1"> Revise today's lessons</label>
+            <label><input type="checkbox" id="goal2"> Practice coding</label>
+            <label><input type="checkbox" id="goal3"> Review what I learned</label>
+        </div>
+        <p id="goalMessage" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+        <h2>Add a Study Task</h2>
+
+        <form id="taskForm">
+            <label for="taskInput">Task name</label>
+            <input id="taskInput" placeholder="Example: Practice Python loops" required>
+
+            <label for="subject">Subject</label>
+            <select id="subject">
+                <option>Python</option>
+                <option>HTML and CSS</option>
+                <option>Mathematics</option>
+                <option>Artificial Intelligence</option>
+                <option>English</option>
+                <option>Other</option>
+            </select>
+
+            <label for="priority">Priority</label>
+            <select id="priority">
+                <option>High</option>
+                <option selected>Medium</option>
+                <option>Low</option>
+            </select>
+
+            <label for="deadline">Deadline (optional)</label>
+            <input id="deadline" type="date">
+
+            <button class="full-button" type="submit">Add Task</button>
+        </form>
+        <p id="message" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+        <h2>My Study Tasks</h2>
+
+        <label for="taskFilter">Filter tasks</label>
+        <select id="taskFilter">
+            <option value="All">All tasks</option>
+            <option value="Pending">Pending tasks</option>
+            <option value="Completed">Completed tasks</option>
+            <option value="High">High priority</option>
+        </select>
+
+        <div id="taskList"></div>
+    </section>
+
+    <section class="card">
+        <h2>Focus Timer</h2>
+        <p class="muted">Focus for 25 minutes, then take a 5-minute break.</p>
+
+        <div id="timerMode">Focus Session</div>
+        <div class="timer" id="timerDisplay">25:00</div>
+
+        <div class="timer-buttons">
+            <button type="button" id="startTimer">Start</button>
+            <button type="button" class="secondary-button" id="pauseTimer">Pause</button>
+            <button type="button" class="secondary-button" id="resetTimer">Reset</button>
+        </div>
+
+        <button type="button" class="full-button" id="breakTimer">
+            Switch to 5-Minute Break
+        </button>
+        <p id="timerMessage" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+        <h2>My Personalized Study Planner</h2>
+
+        <label for="studyHours">Available study time</label>
+        <select id="studyHours">
+            <option value="1">1 hour</option>
+            <option value="2" selected>2 hours</option>
+            <option value="3">3 hours</option>
+            <option value="4">4 hours</option>
+        </select>
+
+        <button type="button" class="full-button" id="generatePlan">
+            Generate My Study Plan
+        </button>
+
+        <div id="studyPlan"></div>
+    </section>
+
+    <section class="card">
+        <h2>Smart Study Recommendations</h2>
+        <p class="muted">Suggestions are generated from your task list and priorities using simple rules.</p>
+        <div id="recommendations"></div>
+        <button type="button" class="full-button" id="refreshRecommendations">
+            Refresh Recommendations
+        </button>
+    </section>
+
+    <section class="card">
+        <h2>Study Tip of the Day</h2>
+        <p id="studyTip">Study for 25 minutes, take a 5-minute break, and repeat.</p>
+        <button type="button" class="full-button" id="newTip">Get Another Study Tip</button>
+    </section>
+
+    <section class="card">
+        <h2>My Data</h2>
+        <p class="muted">Your tasks, goals, and study history are saved in this browser.</p>
+        <button type="button" class="secondary-button full-button" id="exportData">
+            Download My Study Data
+        </button>
+        <button type="button" class="red-button full-button" id="clearData">
+            Reset All App Data
+        </button>
+        <p class="muted">Reset permanently clears the app's saved data in this browser.</p>
+    </section>
+</main>
+
+<footer>
+    <p>Student Success Assistant | IBM Datathon 2026</p>
+    <p>Small steps every day lead to big achievements.</p>
+</footer>
+
+<script>
+"use strict";
+
+// ---------- Saved application data ----------
+
+function loadSavedData(key, fallback) {
+    try {
+        const saved = localStorage.getItem(key);
+        return saved === null ? fallback : JSON.parse(saved);
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function saveData(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (error) {
+        showMessage("Browser storage is unavailable or full.");
+        return false;
+    }
+}
+
+let tasks = loadSavedData("studentTasks", []);
+if (!Array.isArray(tasks)) tasks = [];
+
+tasks = tasks.filter(function(task) {
+    return task &&
+        typeof task.name === "string" &&
+        typeof task.subject === "string";
+});
+
+tasks = tasks.map(function(task) {
+    return {
+        name: task.name,
+        subject: task.subject,
+        completed: Boolean(task.completed),
+        priority: ["High", "Medium", "Low"].includes(task.priority)
+            ? task.priority : "Medium",
+        deadline: typeof task.deadline === "string" ? task.deadline : "",
+        completedDate: typeof task.completedDate === "string"
+            ? task.completedDate : ""
+    };
+});
+
+let dailyData = loadSavedData("studentDailyData", {});
+if (!dailyData || typeof dailyData !== "object" || Array.isArray(dailyData)) {
+    dailyData = {};
+}
+
+const today = getToday();
+if (!dailyData[today]) {
+    dailyData[today] = { goals: [false, false, false], sessions: 0 };
+}
+
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+let timerMode = "focus";
+
+const tips = [
+    "Practice coding by writing a small program every day.",
+    "Revise today's lessons before starting a new topic.",
+    "Break difficult topics into smaller tasks.",
+    "Keep your phone away during focused study time.",
+    "Explain what you learned in your own words.",
+    "Take short breaks to refresh your mind.",
+    "Practice Python for at least 20 minutes daily.",
+    "Making mistakes is part of learning. Try again!"
+];
+
+function getToday() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return year + "-" + month + "-" + day;
+}
+
+function showMessage(message) {
+    document.getElementById("message").textContent = message;
+}
+
+function saveTasks() {
+    saveData("studentTasks", tasks);
+}
+
+function saveDailyData() {
+    saveData("studentDailyData", dailyData);
+}
+
+// ---------- Student profile ----------
+
+document.getElementById("saveNameButton").addEventListener("click", function() {
+    const name = document.getElementById("studentName").value.trim();
+
+    if (!name) {
+        document.getElementById("welcomeMessage").textContent =
+            "Please enter your name first.";
+        return;
+    }
+
+    try {
+        localStorage.setItem("studentName", name);
+        document.getElementById("welcomeMessage").textContent =
+            "Welcome, " + name + "! Let's achieve your goals.";
+    } catch (error) {
+        document.getElementById("welcomeMessage").textContent =
+            "Your name could not be saved in this browser.";
+    }
+});
+
+// ---------- Tasks ----------
+
+document.getElementById("taskForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("taskInput").value.trim();
+    if (!name) return;
+
+    tasks.push({
+        name: name,
+        subject: document.getElementById("subject").value,
+        priority: document.getElementById("priority").value,
+        deadline: document.getElementById("deadline").value,
+        completed: false,
+        completedDate: ""
+    });
+
+    document.getElementById("taskInput").value = "";
+    showMessage("Task added successfully!");
+
+    saveTasks();
+    renderTasks();
+    renderRecommendations();
+});
+
+document.getElementById("taskFilter").addEventListener("change", renderTasks);
+
+function renderTasks() {
+    const list = document.getElementById("taskList");
+    const filter = document.getElementById("taskFilter").value;
+    list.innerHTML = "";
+
+    const visibleTasks = tasks
+        .map(function(task, index) {
+            return { task: task, index: index };
+        })
+        .filter(function(entry) {
+            const task = entry.task;
+            if (filter === "Pending") return !task.completed;
+            if (filter === "Completed") return task.completed;
+            if (filter === "High") return task.priority === "High";
+            return true;
+        });
+
+    if (visibleTasks.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "muted";
+        empty.textContent = tasks.length === 0
+            ? "No tasks yet. Add your first study task above."
+            : "No tasks match this filter.";
+        list.appendChild(empty);
+    }
+
+    visibleTasks.forEach(function(entry) {
+        const task = entry.task;
+        const index = entry.index;
+
+        const box = document.createElement("div");
+        box.className = "task" + (task.completed ? " completed" : "");
+
+        const top = document.createElement("div");
+        top.className = "task-top";
+
+        const name = document.createElement("span");
+        name.className = "task-name";
+        name.textContent = task.name + " — " + task.subject;
+
+        const badge = document.createElement("span");
+        badge.className = "priority priority-" + task.priority;
+        badge.textContent = task.priority + " priority";
+
+        top.appendChild(name);
+        top.appendChild(badge);
+        box.appendChild(top);
+
+        const details = document.createElement("div");
+        details.className = "task-details";
+
+        if (task.deadline) {
+            details.textContent = "Deadline: " + task.deadline;
+            if (!task.completed && task.deadline < getToday()) {
+                details.textContent += " — Overdue";
+            }
+        } else {
+            details.textContent = "No deadline set";
+        }
+
+        if (task.completed) {
+            details.textContent += " | Completed";
+        }
+
+        box.appendChild(details);
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const complete = document.createElement("button");
+        complete.className = "green-button";
+        complete.type = "button";
+        complete.textContent = task.completed ? "Completed" : "Mark Done";
+        complete.disabled = task.completed;
+
+        complete.addEventListener("click", function() {
+            tasks[index].completed = true;
+            tasks[index].completedDate = getToday();
+            saveTasks();
+            recordStudyActivity();
+            renderAll();
+            showMessage("Great work! Task completed.");
+        });
+
+        const remove = document.createElement("button");
+        remove.className = "red-button";
+        remove.type = "button";
+        remove.textContent = "Delete";
+
+        remove.addEventListener("click", function() {
+            tasks.splice(index, 1);
+            saveTasks();
+            renderAll();
+            showMessage("Task deleted.");
+        });
+
+        actions.appendChild(complete);
+        actions.appendChild(remove);
+        box.appendChild(actions);
+        list.appendChild(box);
+    });
+
+    updateAnalytics();
+}
+
+function updateAnalytics() {
+    const total = tasks.length;
+    const completed = tasks.filter(function(task) {
+        return task.completed;
+    }).length;
+
+    const percentage = total === 0 ? 0 : Math.round(completed / total * 100);
+
+    document.getElementById("totalTasks").textContent = total;
+    document.getElementById("completedTasks").textContent = completed;
+    document.getElementById("progressFill").style.width = percentage + "%";
+    document.getElementById("progressText").textContent =
+        percentage + "% completed";
+
+    updateDailyGoals();
+    updateStreak();
+}
+
+// ---------- Daily goals and streaks ----------
+
+function updateDailyGoals() {
+    const goals = dailyData[getToday()].goals;
+
+    for (let i = 0; i < 3; i++) {
+        const checkbox = document.getElementById("goal" + (i + 1));
+        checkbox.checked = Boolean(goals[i]);
+    }
+
+    const count = goals.filter(Boolean).length;
+    document.getElementById("goalProgress").textContent = count + " / 3";
+    document.getElementById("goalMessage").textContent =
+        count === 3
+            ? "Amazing! You completed all today's goals."
+            : "Complete " + (3 - count) + " more goal(s) to finish today.";
+}
+
+for (let i = 1; i <= 3; i++) {
+    document.getElementById("goal" + i).addEventListener("change", function() {
+        dailyData[getToday()].goals[i - 1] = this.checked;
+        saveDailyData();
+        updateDailyGoals();
+        updateStreak();
+    });
+}
+
+function recordStudyActivity() {
+    dailyData[getToday()].sessions =
+        (dailyData[getToday()].sessions || 0) + 1;
+    saveDailyData();
+}
+
+function updateStreak() {
+    let streak = 0;
+    const date = new Date();
+
+    // Count consecutive days with at least one goal or completed task.
+    for (let i = 0; i < 366; i++) {
+        const key = date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0") + "-" +
+            String(date.getDate()).padStart(2, "0");
+
+        const data = dailyData[key];
+        const hasGoal = data && Array.isArray(data.goals) &&
+            data.goals.some(Boolean);
+        const hasSession = data && Number(data.sessions) > 0;
+        const hasCompletedTask = tasks.some(function(task) {
+            return task.completedDate === key;
+        });
+
+        if (hasGoal || hasSession || hasCompletedTask) {
+            streak++;
+            date.setDate(date.getDate() - 1);
+        } else {
+            // If today has no activity yet, allow yesterday's streak to remain.
+            if (i === 0) {
+                date.setDate(date.getDate() - 1);
+                continue;
+            }
+            break;
+        }
+    }
+
+    document.getElementById("streakCount").textContent =
+        streak + (streak === 1 ? " day" : " days");
+}
+
+// ---------- Focus timer ----------
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(timerSeconds / 60);
+    const seconds = timerSeconds % 60;
+
+    document.getElementById("timerDisplay").textContent =
+        String(minutes).padStart(2, "0") + ":" +
+        String(seconds).padStart(2, "0");
+
+    document.getElementById("timerMode").textContent =
+        timerMode === "focus" ? "Focus Session" : "Break Time";
+}
+
+function stopTimer() {
+    if (timerInterval !== null) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+document.getElementById("startTimer").addEventListener("click", function() {
+    if (timerInterval !== null) return;
+
+    document.getElementById("timerMessage").textContent =
+        "Stay focused. You've got this!";
+
+    timerInterval = setInterval(function() {
+        timerSeconds--;
+        updateTimerDisplay();
+
+        if (timerSeconds <= 0) {
+            stopTimer();
+
+            if (timerMode === "focus") {
+                recordStudyActivity();
+                timerMode = "break";
+                timerSeconds = 5 * 60;
+                document.getElementById("timerMessage").textContent =
+                    "Focus session finished! Time for a 5-minute break.";
+            } else {
+                timerMode = "focus";
+                timerSeconds = 25 * 60;
+                document.getElementById("timerMessage").textContent =
+                    "Break finished! Ready for another focus session?";
+            }
+
+            updateTimerDisplay();
+            updateStreak();
+        }
+    }, 1000);
+});
+
+document.getElementById("pauseTimer").addEventListener("click", function() {
+    stopTimer();
+    document.getElementById("timerMessage").textContent = "Timer paused.";
+});
+
+document.getElementById("resetTimer").addEventListener("click", function() {
+    stopTimer();
+    timerMode = "focus";
+    timerSeconds = 25 * 60;
+    updateTimerDisplay();
+    document.getElementById("timerMessage").textContent = "Timer reset.";
+});
+
+document.getElementById("breakTimer").addEventListener("click", function() {
+    stopTimer();
+    timerMode = "break";
+    timerSeconds = 5 * 60;
+    updateTimerDisplay();
+    document.getElementById("timerMessage").textContent =
+        "Your break timer is ready.";
+});
+
+// ---------- Study planner ----------
+
+document.getElementById("generatePlan").addEventListener("click", function() {
+    const hours = Number(document.getElementById("studyHours").value);
+    const totalMinutes = hours * 60;
+
+    const planItems = [
+        ["Python Practice", 0.35],
+        ["Mathematics Revision", 0.25],
+        ["Artificial Intelligence", 0.25],
+        ["Review and Recap", 0.15]
+    ];
+
+    const plan = document.getElementById("studyPlan");
+    plan.innerHTML = "";
+
+    const heading = document.createElement("h3");
+    heading.textContent = "Your Daily Study Schedule";
+    plan.appendChild(heading);
+
+    const list = document.createElement("ul");
+    let allocated = 0;
+
+    planItems.forEach(function(item, index) {
+        const minutes = index === planItems.length - 1
+            ? totalMinutes - allocated
+            : Math.round(totalMinutes * item[1]);
+
+        allocated += minutes;
+
+        const li = document.createElement("li");
+        li.textContent = item[0] + ": " + minutes + " minutes";
+        list.appendChild(li);
+    });
+
+    plan.appendChild(list);
+
+    const total = document.createElement("p");
+    total.textContent = "Total study time: " + totalMinutes + " minutes";
+    plan.appendChild(total);
+});
+
+// ---------- Smart recommendations ----------
+
+function renderRecommendations() {
+    const box = document.getElementById("recommendations");
+    box.innerHTML = "";
+
+    const pending = tasks.filter(function(task) {
+        return !task.completed;
+    });
+
+    const overdue = pending.filter(function(task) {
+        return task.deadline && task.deadline < getToday();
+    });
+
+    const high = pending.filter(function(task) {
+        return task.priority === "High";
+    });
+
+    const suggestions = [];
+
+    if (overdue.length > 0) {
+        suggestions.push(
+            "You have " + overdue.length +
+            " overdue task(s). Start by reviewing the deadline and completing one."
+        );
+    }
+
+    if (high.length > 0) {
+        suggestions.push(
+            "Prioritize this high-priority task: " + high[0].name + "."
+        );
+    }
+
+    if (pending.length > 0) {
+        const next = pending.slice().sort(function(a, b) {
+            const rank = { High: 1, Medium: 2, Low: 3 };
+            if (rank[a.priority] !== rank[b.priority]) {
+                return rank[a.priority] - rank[b.priority];
+            }
+            if (a.deadline && b.deadline) {
+                return a.deadline.localeCompare(b.deadline);
+            }
+            if (a.deadline) return -1;
+            if (b.deadline) return 1;
+            return 0;
+        })[0];
+
+        suggestions.push(
+            "Suggested next task: " + next.name + " (" +
+            next.subject + "). Work on it for 25 minutes."
+        );
+    } else {
+        suggestions.push(
+            "You have no pending tasks. Add a new learning goal or revise a topic."
+        );
+    }
+
+    const goalsDone = dailyData[getToday()].goals.filter(Boolean).length;
+    if (goalsDone < 3) {
+        suggestions.push(
+            "Daily goal reminder: complete " + (3 - goalsDone) +
+            " more goal(s) to finish your daily routine."
+        );
+    } else {
+        suggestions.push("You completed all your daily goals. Great job!");
+    }
+
+    suggestions.forEach(function(suggestion) {
+        const item = document.createElement("div");
+        item.className = "recommendation";
+        item.textContent = suggestion;
+        box.appendChild(item);
+    });
+}
+
+document.getElementById("refreshRecommendations")
+    .addEventListener("click", renderRecommendations);
+
+// ---------- Study tips ----------
+
+document.getElementById("newTip").addEventListener("click", function() {
+    const index = Math.floor(Math.random() * tips.length);
+    document.getElementById("studyTip").textContent = tips[index];
+});
+
+// ---------- Export and reset ----------
+
+document.getElementById("exportData").addEventListener("click", function() {
+    const exportObject = {
+        name: document.getElementById("studentName").value,
+        tasks: tasks,
+        dailyData: dailyData,
+        exportedAt: new Date().toISOString()
+    };
+
+    const file = new Blob(
+        [JSON.stringify(exportObject, null, 2)],
+        { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "student-study-data.json";
+    link.click();
+    URL.revokeObjectURL(url);
+});
+
+document.getElementById("clearData").addEventListener("click", function() {
+    const confirmed = confirm(
+        "Are you sure? This will delete your saved name, tasks, goals, and study history."
+    );
+
+    if (!confirmed) return;
+
+    stopTimer();
+
+    try {
+        localStorage.removeItem("studentName");
+        localStorage.removeItem("studentTasks");
+        localStorage.removeItem("studentDailyData");
+    } catch (error) {
+        // Continue resetting the current page.
+    }
+
+    tasks = [];
+    dailyData = {};
+    dailyData[getToday()] = { goals: [false, false, false], sessions: 0 };
+
+    document.getElementById("studentName").value = "";
+    document.getElementById("welcomeMessage").textContent = "";
+    document.getElementById("taskInput").value = "";
+    document.getElementById("message").textContent = "App data reset.";
+
+    renderAll();
+});
+
+// ---------- Initial loading ----------
+
+function renderAll() {
+    renderTasks();
+    renderRecommendations();
+    updateTimerDisplay();
+}
+
+try {
+    const savedName = localStorage.getItem("studentName");
+
+    if (savedName) {
+        document.getElementById("studentName").value = savedName;
+        document.getElementById("welcomeMessage").textContent =
+            "Welcome, " + savedName + "! Let's achieve your goals.";
+    }
+} catch (error) {
+    // The app remains usable if browser storage is unavailable.
+}
+
+updateDailyGoals();
+renderAll();
+</script>
+</body>
+</html>
+
